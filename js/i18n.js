@@ -10,7 +10,7 @@ const I18N = {
     title: "WORLD STRUCTURE EXPORTER",
     desc: "Sube tu mundo de Minecraft Bedrock Edition (.mcworld / .zip) para extraer automáticamente las estructuras normales y plantillas de mapas de MultiWorld (/export y /load) guardadas en LevelDB como archivos .mcstructure.",
     searchPlaceholder: "Buscar por nombre...",
-    btnDownloadAll: "Descargar Todas (ZIP)",
+    btnDownloadAll: "Descargar (ZIP)",
     btnReset: "Cargar Otro Mundo",
     btnSoloMwOn: "Solo MW: ON",
     btnSoloMwOff: "Solo MW: OFF",
@@ -45,7 +45,7 @@ const I18N = {
     statMetaNotDetected: "No detectados",
 
     // Action Buttons
-    btnDownloadZip: "Descargar Mapa (.zip)",
+    btnDownloadZip: "Descargar (.zip)",
     btnMcstructure: ".mcstructure",
     btnRawData: "Raw Data ({count})",
 
@@ -89,7 +89,7 @@ const I18N = {
     title: "WORLD STRUCTURE EXPORTER",
     desc: "Upload your Minecraft Bedrock Edition world (.mcworld / .zip) to automatically extract normal structures and MultiWorld map templates (/export & /load) saved in LevelDB as .mcstructure files.",
     searchPlaceholder: "Search by name...",
-    btnDownloadAll: "Download All (ZIP)",
+    btnDownloadAll: "Download (ZIP)",
     btnReset: "Load Another World",
     btnSoloMwOn: "Only MW: ON",
     btnSoloMwOff: "Only MW: OFF",
@@ -124,7 +124,7 @@ const I18N = {
     statMetaNotDetected: "Not detected",
 
     // Action Buttons
-    btnDownloadZip: "Download Map (.zip)",
+    btnDownloadZip: "Download (.zip)",
     btnMcstructure: ".mcstructure",
     btnRawData: "Raw Data ({count})",
 
