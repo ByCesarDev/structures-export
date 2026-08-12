@@ -5,11 +5,24 @@ if(document.getElementById("left")){
 
     const path = window.location.pathname;
     const items = document.querySelectorAll('#left .sidebar-item');
+
+    const isHome = path === '/' || 
+                   path.endsWith('/') || 
+                   path.endsWith('/index.html') || 
+                   path.endsWith('/home');
+
     items.forEach(item => {
       const href = item.getAttribute('href');
-      if (href && (href === path || (href !== '/' && path.includes(href)))) {
+      if (!href) return;
+
+      const isHomeHref = href === '/' || 
+                         href === './' || 
+                         href === 'index.html' || 
+                         href.endsWith('/index.html');
+
+      if (isHome && isHomeHref) {
         item.classList.add('active');
-      } else if (href === '/' && (path === '/' || path === '/index.html' || path === '/home')) {
+      } else if (!isHomeHref && href !== '#' && !href.startsWith('http') && path.includes(href)) {
         item.classList.add('active');
       } else {
         item.classList.remove('active');
