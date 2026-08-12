@@ -1,17 +1,37 @@
+/* Custom Neon Purple & Dark Glass Scrollbar System */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: rgba(6, 16, 34, 0.6);
   border-radius: 10px;
-  margin-left: 2px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888888;
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.75) 0%, rgba(126, 34, 206, 0.75) 100%);
   border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #c084fc 0%, #9333ea 100%);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #22d3ee 0%, #a855f7 100%);
+}
+
+::-webkit-scrollbar-corner {
+  background: #020817;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168, 85, 247, 0.5) rgba(6, 16, 34, 0.6);
 }
 
 :root {

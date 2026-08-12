@@ -15,6 +15,8 @@ if(document.getElementById("left")){
         item.classList.remove('active');
       }
     });
+
+    if (typeof updateUiTexts === "function") updateUiTexts();
   });
 }
 
