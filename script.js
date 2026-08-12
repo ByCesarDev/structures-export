@@ -1,6 +1,6 @@
 //Load navigation bars
 if(document.getElementById("left")){
-  fetch('/navleft.html').then((response) => response.text()).then((data) => {
+  fetch('navleft.html').then((response) => response.text()).then((data) => {
     document.getElementById("left").innerHTML = data;
 
     const path = window.location.pathname;
@@ -19,9 +19,9 @@ if(document.getElementById("left")){
 }
 
 if(document.getElementById("head")){
-  fetch('/navtop.html').then((response) => response.text()).then((data) => {
+  fetch('navtop.html').then((response) => response.text()).then((data) => {
     document.getElementById("head").innerHTML = data;
-    if(window.localStorage.getItem("isDev") == 'true'){ 
+    if(window.localStorage.getItem("isDev") == 'true'){
       document.getElementById("head").innerHTML += "<span class='devviewstable' onclick='openDevWindow()'>Dev Tools</span>";
     }
   });

@@ -268,7 +268,7 @@ html {
   padding: 5px 5px;
   font-family: 'Inter', sans-serif;
   text-indent: 5px;
-  background-image: url(/assets/icons/magnifyingGlass.png);
+  background-image: url(assets/icons/magnifyingGlass.png);
   background-repeat: no-repeat;
   background-size: 22px;
   image-rendering: pixelated;
@@ -1010,20 +1010,20 @@ h1 {
 
 @font-face {
   font-family: MinecraftTen;
-  src: url(/assets/fonts/MinecraftTen.woff);
+  src: url(assets/fonts/MinecraftTen.woff);
 }
 
 @font-face {
   font-family: MinecraftSeven;
-  src: url(/assets/fonts/MinecraftSeven.woff);
+  src: url(assets/fonts/MinecraftSeven.woff);
 }
 
 @font-face {
   font-family: MinecraftFive;
-  src: url(/assets/fonts/MinecraftFive-Bold.woff);
+  src: url(assets/fonts/MinecraftFive-Bold.woff);
 }
 
 @font-face {
   font-family: Minecraftia;
-  src: url(/assets/fonts/minecraftia.ttf);
+  src: url(assets/fonts/minecraftia.ttf);
 }
