@@ -454,7 +454,8 @@
 
         let displayCount = structures.length;
         if (onlyMwFilter) {
-          const groups = groupMultiWorldTemplates(structures);
+          const mwStructures = structures.filter(s => isMultiWorldStructure(s));
+          const groups = groupMultiWorldTemplates(mwStructures);
           displayCount = groups.length;
         }
         document.getElementById("structureCountBadge").innerText = displayCount;
@@ -480,7 +481,8 @@
         // MODO A: SOLO MW ACTIVADO -> GRID 2 COLUMNAS CON ACCENT VARIABILITY (PURPLE / CYAN)
         if (onlyMwFilter) {
           grid.className = "structure-grid-3col";
-          const groups = groupMultiWorldTemplates(structures);
+          const mwStructures = structures.filter(s => isMultiWorldStructure(s));
+          const groups = groupMultiWorldTemplates(mwStructures);
 
           groups.forEach((grp, idx) => {
             const templateCard = document.createElement("div");

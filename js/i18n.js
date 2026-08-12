@@ -175,7 +175,9 @@ function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem("app_lang", lang);
   updateUiTexts();
-  if (typeof renderGrid === "function" && typeof currentStructures !== "undefined" && currentStructures) {
+  if (typeof filterStructures === "function") {
+    filterStructures();
+  } else if (typeof renderGrid === "function" && typeof currentStructures !== "undefined" && currentStructures) {
     renderGrid(currentStructures);
   }
 }
