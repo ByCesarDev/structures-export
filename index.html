@@ -564,7 +564,7 @@
                 </div>
               </div>
 
-              <!-- 4 Action Buttons Row -->
+              <!-- Action Buttons Row (ZIP and Raw Data) -->
               <div class="card-actions-grid-4">
                 <button class="btn-action-cell btn-variant-green" onclick="downloadTemplateGroup('${grp.groupKey}')">
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
@@ -573,14 +573,6 @@
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                   </svg>
                   ${t('btnDownloadZip')}
-                </button>
-                <button class="btn-action-cell btn-variant-purple" onclick="downloadSingle('${firstItem.id}')">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
-                  ${t('btnMcstructure')}
                 </button>
                 <button class="btn-action-cell btn-variant-dark" onclick="toggleTreeBranch('${treeId}')">
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
@@ -727,7 +719,7 @@
             </div>
 
             <div class="card-actions-grid-4">
-              <button class="btn-action-cell btn-variant-purple" style="grid-column: span 4;" onclick="downloadSingle('${struct.id}')">
+              <button class="btn-action-cell btn-variant-purple" style="grid-column: 1 / -1;" onclick="downloadSingle('${struct.id}')">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 ${t('btnMcstructure')}
               </button>

@@ -869,18 +869,12 @@ html, body {
   color: #f1f5f9;
 }
 
-/* Card Actions Grid (4 columns) */
+/* Card Actions Grid (2 columns: ZIP and Raw Data) */
 .card-actions-grid-4 {
   margin-top: 14px;
   display: grid;
-  grid-template-columns: 1.13fr 1fr 0.8fr 1.05fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-}
-
-@media (max-width: 650px) {
-  .card-actions-grid-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 .btn-action-cell {
@@ -1814,10 +1808,6 @@ html, body {
     gap: 8px !important;
     width: 100% !important;
     box-sizing: border-box !important;
-  }
-
-  .card-actions-grid-4 .btn-action-cell:first-child {
-    grid-column: 1 / -1 !important;
   }
 
   .btn-action-cell {
