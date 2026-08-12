@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#020817" />
+    <link rel="icon" href="/favicon.ico"/>
+    
+    <title>MultiWorld & Bedrock World Structure Exporter</title>
+
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Hojas de estilo -->
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/home.css">
+
+    <!-- Librerías JS core -->
+    <script src="/pnbt.js"></script>
+    <script src="/jszip.js"></script>
+    <script src="/filesaver.js"></script>
+    <script src="/js/world-structure-extractor.js" defer></script>
+    <script src="/apps.js" defer></script>
+    <script src="/script.js" defer></script>
+    <script src="/leveldat.js" defer></script>
+  </head>
+  <body>
+    <div id="head" class="header" style="display:none;"></div>
+    <div id="body" class="main-content">
+      <!-- Mobile Sidebar Overlay -->
+      <div class="mobile-sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+      <div id="left" class="main-left"></div>
+      <div id="right" class="main-right">
+        
+        <!-- Header Banner Container -->
+        <div class="banner-container">
+          <div class="top-corner-badges">
+            <span class="version-pill">v1.0.0</span>
+          </div>
+          
+          <div class="banner-main-row">
+            <div class="banner-hero-left">
+              <!-- Mobile Menu Button (replaces portal-avatar-box on mobile) -->
+              <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+              </button>
+
+              <div class="portal-avatar-box">
+                <img src="/assets/header.png" class="portal-header-img" alt="MultiWorld Header Artwork" />
+              </div>
+              <div class="banner-copy">
+                <div class="banner-eyebrow">MULTIWORLD & BEDROCK</div>
+                <h1 class="banner-title">WORLD STRUCTURE EXPORTER</h1>
+                <p class="banner-desc">Sube tu mundo de Minecraft Bedrock Edition (.mcworld / .zip) para extraer automáticamente las estructuras normales y plantillas de mapas de MultiWorld (/export y /load) guardadas en LevelDB como archivos .mcstructure.</p>
+              </div>
+            </div>
+            <div class="banner-toolbar-row">
+              <div class="search-input-wrapper" id="searchWrapper" style="display:none;">
+                <input type="text" id="searchInput" placeholder="Buscar por nombre..." oninput="filterStructures()" class="search-input" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+
+              <!-- Botones de acción para desktop -->
+              <button id="downloadAllBtn" type="button" class="btn btn-primary-purple" onclick="downloadAllStructures()" style="display:none;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Descargar Todas (ZIP)
+              </button>
+              <button type="button" id="resetBtn" class="btn btn-dark-outline" onclick="resetExtractor()" style="display:none;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2f"></path>
+                </svg>
+                Cargar Otro Mundo
+              </button>
+              <button type="button" id="toggleMwBtn" class="btn btn-green-outline active" onclick="toggleMwFilter()" style="display:none;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                Solo MW: ON
+              </button>
+
+              <!-- Botón Mostrar/Ocultar (solo móvil) -->
+              <button id="showActionsBtn" type="button" class="btn btn-dark-outline" onclick="toggleMobileActions()" style="display:none;">
+                <svg id="showIcon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8 11-8 11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg id="hideIcon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a15.3 15.3 0 0 1 4-10 15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1 4-10 15.3 15.3 0 0 1 4-10"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+                <span id="showHideText">Filtros</span>
+              </button>
+
+              <!-- Botones de acción para móvil (colapsables) -->
+              <div id="mobileActionsGroup">
+                <button id="mobileDownloadAllBtn" type="button" class="btn btn-primary-purple" onclick="downloadAllStructures()">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Descargar Todas (ZIP)
+                </button>
+                <button type="button" id="mobileResetBtn" class="btn btn-dark-outline" onclick="resetExtractor()">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2f"></path>
+                  </svg>
+                  Cargar Otro Mundo
+                </button>
+                <button type="button" id="mobileToggleMwBtn" class="btn btn-green-outline active" onclick="toggleMwFilter()">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                  Solo MW: ON
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Zona de Drag & Drop -->
+        <div id="dropzone" class="dropzone" onclick="document.getElementById('worldFileInput').click()">
+          <svg viewBox="0 0 24 24" class="dropzone-icon">
+            <path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+          </svg>
+          <h3>Arrastra y suelta tu archivo .mcworld o .zip aquí</h3>
+          <p>O haz clic para examinar los archivos de tu equipo</p>
+          <button type="button" class="btn btn-primary-purple" onclick="event.stopPropagation(); document.getElementById('worldFileInput').click();">
+            Seleccionar Mundo (.mcworld)
+          </button>
+          <input type="file" id="worldFileInput" accept=".mcworld,.zip,.mctemplate" style="display:none;" />
+        </div>
+
+        <!-- Barra de Progreso -->
+        <div id="progressContainer" class="progress-container" style="display:none;">
+          <div class="progress-header">
+            <span id="progressStepText">Procesando archivo...</span>
+            <span id="progressPercentText">0%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div id="progressBar" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Vista de Resultados -->
+        <div id="resultsContainer" class="results-container" style="display:none;">
+          <div class="section-header-bar">
+            <div class="section-header-title">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+              Estructuras Encontradas
+              <span id="structureCountBadge" class="count-badge-pill">0</span>
+            </div>
+          </div>
+
+          <div id="structuresGrid" class="structure-grid-3col"></div>
+        </div>
+
+        <!-- Sección de Información y Guía -->
+        <div id="infoSection" class="info-section">
+          <div class="info-section-header">
+            <span class="info-eyebrow-pill">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              GUÍA Y FUNCIONAMIENTO
+            </span>
+            <h2 class="info-section-title">¿Cómo funciona la extracción para MultiWorld?</h2>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-card card-purple">
+              <div class="info-icon-badge">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+              </div>
+              <h4 class="info-card-title">Integración con MultiWorld</h4>
+              <p class="info-card-desc">Detecta automáticamente los mapas exportados con el comando <code>/export &lt;nombre&gt;</code> de MultiWorld guardados en LevelDB (prefijos <code>multiworld:</code> y fragmentos de mapa).</p>
+            </div>
+
+            <div class="info-card card-cyan">
+              <div class="info-icon-badge">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+              </div>
+              <h4 class="info-card-title">Vista 2 Columnas & Raw Data</h4>
+              <p class="info-card-desc">Al activar el modo <code>Solo MW</code>, las estructuras se organizan en un grid de 2 columnas alternando acentos púrpura y cyan con acceso a Raw Data.</p>
+            </div>
+
+            <div class="info-card card-green">
+              <div class="info-icon-badge">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+              </div>
+              <h4 class="info-card-title">Exportación e Importación /load</h4>
+              <p class="info-card-desc">Genera archivos <code>.mcstructure</code> estándar compatibles con el comando <code>/load &lt;mundo&gt; &lt;nombre&gt;</code> de MultiWorld.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Page Footer -->
+        <div class="page-footer">
+          MultiWorld Structure Exporter  •  Compatible con Minecraft Bedrock Edition 1.20+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Script de interacción de la interfaz -->
+    <script>
+      let extractor = null;
+      let currentStructures = [];
+      let onlyMwFilter = true;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        extractor = new WorldStructureExtractor();
+
+        const dropzone = document.getElementById("dropzone");
+        const fileInput = document.getElementById("worldFileInput");
+
+        dropzone.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          dropzone.classList.add("dragover");
+        });
+
+        dropzone.addEventListener("dragleave", () => {
+          dropzone.classList.remove("dragover");
+        });
+
+        dropzone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dropzone.classList.remove("dragover");
+          if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            handleFileSelect(e.dataTransfer.files[0]);
+          }
+        });
+
+        fileInput.addEventListener("change", (e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+          }
+        });
+      });
+
+      async function handleFileSelect(file) {
+        if (!file) return;
+
+        const dropzone = document.getElementById("dropzone");
+        const progressContainer = document.getElementById("progressContainer");
+        const resultsContainer = document.getElementById("resultsContainer");
+        const infoSection = document.getElementById("infoSection");
+        const progressBar = document.getElementById("progressBar");
+        const progressStepText = document.getElementById("progressStepText");
+        const progressPercentText = document.getElementById("progressPercentText");
+
+        dropzone.style.display = "none";
+        infoSection.style.display = "none";
+        resultsContainer.style.display = "none";
+        progressContainer.style.display = "block";
+
+        try {
+          currentStructures = await extractor.processWorldFile(file, (msg, percent) => {
+            progressStepText.innerText = msg;
+            progressPercentText.innerText = percent + "%";
+            progressBar.style.width = percent + "%";
+          });
+
+          displayResults(currentStructures);
+        } catch (err) {
+          alert("Error al procesar el mundo: " + err.message);
+          resetExtractor();
+        }
+      }
+
+      function isMultiWorldStructure(struct) {
+        if (!struct) return false;
+        const name = (struct.name || "").toLowerCase();
+        const path = (struct.sourcePath || "").toLowerCase();
+        return name.includes("multiworld") || 
+               name.startsWith("mw:") || 
+               name.includes("__chunk_") || 
+               name.includes("__meta_") || 
+               path.includes("multiworld");
+      }
+
+      function parseMwTemplateInfo(struct) {
+        const name = struct.name || "";
+
+        const match1 = name.match(/^(?:multiworld:|mw:)?([a-zA-Z0-9._-]+)__r([a-zA-Z0-9]+)__(chunk|meta)_(.+)$/i);
+        if (match1) {
+          return {
+            mapName: match1[1],
+            revision: match1[2],
+            type: match1[3],
+            details: match1[4],
+            isMeta: match1[3] === "meta"
+          };
+        }
+
+        const match2 = name.match(/^([a-zA-Z0-9._-]+)_(\d+)_(\d+)$/i);
+        if (match2) {
+          return {
+            mapName: match2[1],
+            revision: "MSB09Y9N",
+            type: "chunk",
+            details: `${match2[2]}_${match2[3]}`,
+            isMeta: false
+          };
+        }
+
+        const match3 = name.match(/^(?:multiworld:|mw:)?([a-zA-Z0-9._-]+)$/i);
+        if (match3) {
+          return {
+            mapName: match3[1],
+            revision: "MSB09Y9N",
+            type: "map",
+            details: "",
+            isMeta: false
+          };
+        }
+
+        return {
+          mapName: name.replace(/^multiworld:/i, "").split("_")[0] || "mapa_mw",
+          revision: "MSB09Y9N",
+          type: "desconocido",
+          details: "",
+          isMeta: false
+        };
+      }
+
+      function groupMultiWorldTemplates(mwStructures) {
+        const groups = new Map();
+
+        for (const struct of mwStructures) {
+          const info = parseMwTemplateInfo(struct);
+          const groupKey = `${info.mapName}__r${info.revision}`;
+
+          if (!groups.has(groupKey)) {
+            groups.set(groupKey, {
+              groupKey,
+              mapName: info.mapName,
+              revision: info.revision,
+              items: [],
+              metaItem: null,
+              chunks: [],
+              totalVolume: 0,
+              maxSizeX: 0,
+              maxSizeY: 0,
+              maxSizeZ: 0
+            });
+          }
+
+          const grp = groups.get(groupKey);
+          grp.items.push(struct);
+
+          if (info.isMeta) {
+            grp.metaItem = struct;
+          } else {
+            grp.chunks.push(struct);
+          }
+
+          const meta = struct.metadata || { size: [0, 0, 0], volume: 0 };
+          const [sx, sy, sz] = meta.size || [0, 0, 0];
+          grp.totalVolume += meta.volume || 0;
+          grp.maxSizeX = Math.max(grp.maxSizeX, sx);
+          grp.maxSizeY = Math.max(grp.maxSizeY, sy);
+          grp.maxSizeZ = Math.max(grp.maxSizeZ, sz);
+        }
+
+        return Array.from(groups.values());
+      }
+
+      function toggleMwFilter() {
+        onlyMwFilter = !onlyMwFilter;
+        const btn = document.getElementById("toggleMwBtn");
+        const mobileBtn = document.getElementById("mobileToggleMwBtn");
+        if (onlyMwFilter) {
+          btn.className = "btn btn-green-outline active";
+          btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> Solo MW: ON`;
+          if (mobileBtn) {
+            mobileBtn.className = "btn btn-green-outline active";
+            mobileBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> Solo MW: ON`;
+          }
+        } else {
+          btn.className = "btn btn-dark-outline";
+          btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> Solo MW: OFF`;
+          if (mobileBtn) {
+            mobileBtn.className = "btn btn-dark-outline";
+            mobileBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> Solo MW: OFF`;
+          }
+        }
+        filterStructures();
+      }
+
+      function displayResults(structures) {
+        document.getElementById("progressContainer").style.display = "none";
+        document.getElementById("resultsContainer").style.display = "block";
+
+        // Mostrar botones de acción después de procesar un mapa
+        document.getElementById("searchWrapper").style.display = "flex";
+
+        // En móvil, mostrar el botón "Filtros" en lugar de las acciones directas
+        if (window.innerWidth <= 767) {
+          document.getElementById("showActionsBtn").style.display = "inline-flex";
+          // El CSS controlará la visibilidad del grupo de acciones
+        } else {
+          // En desktop, mostrar los botones individuales directamente
+          document.getElementById("showActionsBtn").style.display = "none";
+          document.getElementById("downloadAllBtn").style.display = "inline-flex";
+          document.getElementById("resetBtn").style.display = "inline-flex";
+          document.getElementById("toggleMwBtn").style.display = "inline-flex";
+        }
+
+        filterStructures();
+      }
+
+      function renderGrid(structures) {
+        const grid = document.getElementById("structuresGrid");
+        grid.innerHTML = "";
+
+        let displayCount = structures.length;
+        if (onlyMwFilter) {
+          const groups = groupMultiWorldTemplates(structures);
+          displayCount = groups.length;
+        }
+        document.getElementById("structureCountBadge").innerText = displayCount;
+
+        if (structures.length === 0) {
+          const logsText = extractor.debugLogs ? extractor.debugLogs.join("\n") : "";
+          grid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+              <h3>No se encontraron estructuras ${onlyMwFilter ? 'de MultiWorld' : 'guardadas'}</h3>
+              <p>${onlyMwFilter ? 'Desactiva el filtro "Solo MW" para ver todas las estructuras del mundo.' : 'Asegúrate de haber guardado al menos una estructura con un Bloque de Estructura, /structure save o /export en MultiWorld.'}</p>
+              <div style="margin-top: 15px;">
+                <button type="button" class="btn btn-dark-outline btn-sm" onclick="toggleDebugLogs()">Ver Registro de Diagnóstico</button>
+              </div>
+              <textarea id="debugLogsArea" readonly style="display:none; width:100%; height:180px; margin-top:15px; background:#070d1c; color:#00ff66; font-family:monospace; padding:10px; border:1px solid #1e293b; border-radius:8px; font-size:12px;"></textarea>
+            </div>
+          `;
+          if (document.getElementById("debugLogsArea")) {
+            document.getElementById("debugLogsArea").value = logsText;
+          }
+          return;
+        }
+
+        // MODO A: SOLO MW ACTIVADO -> GRID 2 COLUMNAS CON ACCENT VARIABILITY (PURPLE / CYAN)
+        if (onlyMwFilter) {
+          grid.className = "structure-grid-3col";
+          const groups = groupMultiWorldTemplates(structures);
+
+          groups.forEach((grp, idx) => {
+            const templateCard = document.createElement("div");
+            const accentClass = idx % 2 === 0 ? "accent-purple" : "accent-cyan";
+            templateCard.className = `structure-card-box ${accentClass}`;
+
+            const chunkCount = grp.chunks.length;
+            const hasMeta = !!grp.metaItem;
+            const treeId = "tree_" + grp.groupKey.replace(/[^a-zA-Z0-9_\-]/g, "_");
+            const firstItem = grp.items[0];
+
+            templateCard.innerHTML = `
+              <div class="card-header-row">
+                <div class="card-header-left">
+                  <div class="card-icon-box">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                      <polyline points="2 17 12 22 22 17"></polyline>
+                      <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                  </div>
+                  <div class="card-title-text">Plantilla: ${grp.mapName}</div>
+                </div>
+                <div class="card-header-right">
+                  <span class="badge-template-tag">MULTIWORLD TEMPLATE</span>
+                  <span class="badge-revision-box">REVISIÓN: ${grp.revision.toUpperCase()}</span>
+                </div>
+              </div>
+
+              <!-- Unified 2x2 Stats Panel -->
+              <div class="card-stats-panel-2x2">
+                <div class="stat-cell">
+                  <div class="stat-icon-square">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect>
+                      <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                  </div>
+                  <div class="stat-info-column">
+                    <span class="stat-label-text">Trozos de Mapa (Chunks)</span>
+                    <span class="stat-value-text">${chunkCount} fragmentos</span>
+                  </div>
+                </div>
+                <div class="stat-cell">
+                  <div class="stat-icon-square">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                  </div>
+                  <div class="stat-info-column">
+                    <span class="stat-label-text">Volumen Acumulado</span>
+                    <span class="stat-value-text">${grp.totalVolume.toLocaleString()} bloques</span>
+                  </div>
+                </div>
+                <div class="stat-cell">
+                  <div class="stat-icon-square">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    </svg>
+                  </div>
+                  <div class="stat-info-column">
+                    <span class="stat-label-text">Dimensión Máx por Trozo</span>
+                    <span class="stat-value-text">${grp.maxSizeX} × ${grp.maxSizeY} × ${grp.maxSizeZ}</span>
+                  </div>
+                </div>
+                <div class="stat-cell">
+                  <div class="stat-icon-square">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#10b981" stroke-width="2.5">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                  </div>
+                  <div class="stat-info-column">
+                    <span class="stat-label-text">Metadatos en LevelDB</span>
+                    <span class="stat-value-text">${hasMeta ? 'Presentes' : 'No detectados'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4 Action Buttons Row -->
+              <div class="card-actions-grid-4">
+                <button class="btn-action-cell btn-variant-green" onclick="downloadTemplateGroup('${grp.groupKey}')">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Descargar Mapa (.zip)
+                </button>
+                <button class="btn-action-cell btn-variant-purple" onclick="downloadSingle('${firstItem.id}')">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  .mcstructure
+                </button>
+                <button class="btn-action-cell btn-variant-dark" onclick="toggleTreeBranch('${treeId}')">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                  </svg>
+                  Raw Data (${grp.items.length})
+                </button>
+              </div>
+
+              <!-- Nested Raw Data Tree Box -->
+              <div id="${treeId}" class="raw-data-nested-box">
+                ${grp.items.map(item => {
+                  const meta = item.metadata || { size: [0, 0, 0], volume: 0 };
+                  const [sx, sy, sz] = meta.size || [0, 0, 0];
+                  return `
+                    <div class="raw-data-row">
+                      <span>${item.name} (${sx}×${sy}×${sz})</span>
+                      <div style="display:flex; gap:4px;">
+                        <button class="btn-action-cell btn-variant-purple" style="padding:2px 6px; height:24px;" onclick="downloadSingle('${item.id}')">
+                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `;
+
+            grid.appendChild(templateCard);
+          });
+
+          return;
+        }
+
+        // MODO B: SOLO MW DESACTIVADO -> ESTRUCTURAS INDIVIDUALES (ALTERNATING ACCENTS)
+        grid.className = "structure-grid-3col";
+
+        structures.forEach((struct, idx) => {
+          const card = document.createElement("div");
+          const accentClass = idx % 2 === 0 ? "accent-purple" : "accent-cyan";
+          card.className = `structure-card-box ${accentClass}`;
+
+          const meta = struct.metadata || { size: [0, 0, 0], volume: 0, blockPaletteCount: 0, entityCount: 0 };
+          const [sx, sy, sz] = meta.size || [0, 0, 0];
+          const isMw = isMultiWorldStructure(struct);
+          const isDb = struct.source.includes("LevelDB");
+
+          card.innerHTML = `
+            <div class="card-header-row">
+              <div class="card-header-left">
+                <div class="card-icon-box">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                  </svg>
+                </div>
+                <div class="card-title-text">${struct.name}</div>
+              </div>
+              <div class="card-header-right">
+                <span class="badge-template-tag">
+                  ${isMw ? 'MULTIWORLD' : (isDb ? 'LEVELDB' : 'BEHAVIOR PACK')}
+                </span>
+              </div>
+            </div>
+
+            <div class="card-stats-panel-2x2">
+              <div class="stat-cell">
+                <div class="stat-icon-square">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  </svg>
+                </div>
+                <div class="stat-info-column">
+                  <span class="stat-label-text">Dimensiones</span>
+                  <span class="stat-value-text">${sx} × ${sy} × ${sz}</span>
+                </div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-icon-square">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg>
+                </div>
+                <div class="stat-info-column">
+                  <span class="stat-label-text">Volumen Total</span>
+                  <span class="stat-value-text">${meta.volume.toLocaleString()} bloques</span>
+                </div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-icon-square">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                </div>
+                <div class="stat-info-column">
+                  <span class="stat-label-text">Tipos de Bloque</span>
+                  <span class="stat-value-text">${meta.blockPaletteCount}</span>
+                </div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-icon-square">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="4"></circle>
+                  </svg>
+                </div>
+                <div class="stat-info-column">
+                  <span class="stat-label-text">Entidades</span>
+                  <span class="stat-value-text">${meta.entityCount}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-actions-grid-4">
+              <button class="btn-action-cell btn-variant-purple" style="grid-column: span 4;" onclick="downloadSingle('${struct.id}')">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Descargar .mcstructure
+              </button>
+            </div>
+          `;
+
+          grid.appendChild(card);
+        });
+      }
+
+      function toggleTreeBranch(treeId) {
+        const el = document.getElementById(treeId);
+        if (el) {
+          el.classList.toggle('expanded');
+        }
+      }
+
+      function downloadTemplateGroup(groupKey) {
+        const mwStructures = currentStructures.filter(s => isMultiWorldStructure(s));
+        const groups = groupMultiWorldTemplates(mwStructures);
+        const target = groups.find(g => g.groupKey === groupKey);
+        if (target && target.items.length > 0) {
+          extractor.exportAllAsZip(target.items, `multiworld_${target.mapName}_${target.revision}.zip`);
+        }
+      }
+
+      function toggleDebugLogs() {
+        const area = document.getElementById("debugLogsArea");
+        if (area) {
+          area.style.display = area.style.display === "none" ? "block" : "none";
+        }
+      }
+
+      function downloadSingle(structId) {
+        const struct = currentStructures.find(s => s.id === structId);
+        if (struct) {
+          extractor.exportSingleStructure(struct);
+        }
+      }
+
+
+
+      function downloadAllStructures() {
+        const toDownload = onlyMwFilter ? currentStructures.filter(s => isMultiWorldStructure(s)) : currentStructures;
+        if (toDownload.length === 0) return;
+        const zipName = onlyMwFilter ? "estructuras_multiworld.zip" : "estructuras_mundo.zip";
+        extractor.exportAllAsZip(toDownload, zipName);
+      }
+
+      function filterStructures() {
+        const query = document.getElementById("searchInput").value.toLowerCase();
+        let filtered = currentStructures.filter(s => s.name.toLowerCase().includes(query));
+
+        if (onlyMwFilter) {
+          filtered = filtered.filter(s => isMultiWorldStructure(s));
+        }
+
+        renderGrid(filtered);
+      }
+
+      function resetExtractor() {
+        document.getElementById("dropzone").style.display = "block";
+        document.getElementById("infoSection").style.display = "block";
+        document.getElementById("progressContainer").style.display = "none";
+        document.getElementById("resultsContainer").style.display = "none";
+        document.getElementById("worldFileInput").value = "";
+        currentStructures = [];
+        onlyMwFilter = true;
+
+        // Ocultar todos los botones de acción al resetear
+        document.getElementById("searchWrapper").style.display = "none";
+        document.getElementById("mobileActionsGroup").style.display = "none";
+        document.getElementById("showActionsBtn").style.display = "none";
+        document.getElementById("downloadAllBtn").style.display = "none";
+        document.getElementById("resetBtn").style.display = "none";
+        document.getElementById("toggleMwBtn").style.display = "none";
+
+        // Remover clase de acciones visibles y resetear estado del botón
+        document.body.classList.remove('mobile-actions-visible');
+
+        // Resetear icono y texto del botón mostrar/ocultar
+        const showIcon = document.getElementById('showIcon');
+        const hideIcon = document.getElementById('hideIcon');
+        const showHideText = document.getElementById('showHideText');
+        if (showIcon) showIcon.style.display = 'block';
+        if (hideIcon) hideIcon.style.display = 'none';
+        if (showHideText) showHideText.textContent = 'Filtros';
+
+        const btn = document.getElementById("toggleMwBtn");
+        if (btn) {
+          btn.className = "btn btn-green-outline active";
+          btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> Solo MW: ON`;
+        }
+      }
+
+      function toggleMobileSidebar() {
+        document.body.classList.toggle('mobile-sidebar-open');
+      }
+
+      function toggleMobileActions() {
+        document.body.classList.toggle('mobile-actions-visible');
+
+        const isVisible = document.body.classList.contains('mobile-actions-visible');
+        const showIcon = document.getElementById('showIcon');
+        const hideIcon = document.getElementById('hideIcon');
+        const showHideText = document.getElementById('showHideText');
+
+        if (isVisible) {
+          showIcon.style.display = 'none';
+          hideIcon.style.display = 'block';
+          showHideText.textContent = 'Cerrar';
+        } else {
+          showIcon.style.display = 'block';
+          hideIcon.style.display = 'none';
+          showHideText.textContent = 'Filtros';
+        }
+      }
+    </script>
+  </body>
+</html>
