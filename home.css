@@ -869,11 +869,11 @@ html, body {
   color: #f1f5f9;
 }
 
-/* Card Actions Grid (2 columns: ZIP and Raw Data) */
+/* Card Actions Grid (Imagen 1 Ratio: 1.6fr 1fr) */
 .card-actions-grid-4 {
   margin-top: 14px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1.6fr 1fr;
   gap: 10px;
 }
 
@@ -1804,7 +1804,7 @@ html, body {
 
   .card-actions-grid-4 {
     display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-columns: 1.5fr 1fr !important;
     gap: 8px !important;
     width: 100% !important;
     box-sizing: border-box !important;
