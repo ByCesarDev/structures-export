@@ -314,7 +314,7 @@ html, body {
   background: #070b19;
 
   border-radius: 14px;
-  padding: 24px 25px 28px 25px;
+  padding: 46px 25px 24px 25px;
   position: relative;
   overflow: visible;
 
@@ -379,7 +379,7 @@ html, body {
 
 .top-corner-badges {
   position: absolute;
-  top: 18px;
+  top: 14px;
   right: 22px;
   display: flex;
   align-items: center;

@@ -523,7 +523,7 @@
                   </div>
                   <div class="stat-info-column">
                     <span class="stat-label-text">${t('statChunksLabel')}</span>
-                    <span class="stat-value-text">${t('statChunksValue', { count: chunkCount })}</span>
+                    <span class="stat-value-text">${chunkCount === 1 ? t('statChunksSingleValue', { count: chunkCount }) : t('statChunksValue', { count: chunkCount })}</span>
                   </div>
                 </div>
                 <div class="stat-cell">
